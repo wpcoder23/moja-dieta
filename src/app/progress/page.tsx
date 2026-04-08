@@ -217,6 +217,7 @@ const WORKOUT_TYPES = [
   { value: "rower", label: "Rower" },
   { value: "plywanie", label: "Plywanie" },
   { value: "yoga", label: "Yoga" },
+  { value: "barre", label: "Barre" },
   { value: "hiit", label: "HIIT" },
   { value: "cardio", label: "Cardio" },
   { value: "inne", label: "Inne" },

@@ -15,6 +15,7 @@ const BURN_RATES: Record<string, number> = {
   rower: 8,
   plywanie: 9,
   yoga: 3,
+  barre: 5,
   hiit: 12,
   cardio: 8,
   inne: 6,
