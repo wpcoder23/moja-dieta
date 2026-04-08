@@ -1,74 +1,119 @@
 "use client";
 
+import { useEffect, useState, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 
-const KRIS_SUPPLEMENTS = [
-  { name: "D3+K2 (Keto Centrum)", dosage: "5000 IU", time: "rano", taken: false },
-  { name: "Magnez (glicynian)", dosage: "400 mg", time: "wieczor", taken: false },
-  { name: "Omega-3 (EPA+DHA)", dosage: "2g", time: "do posilku", taken: false },
-  { name: "Witamina E", dosage: "200 IU", time: "do posilku", taken: false },
-  { name: "Cynk", dosage: "30 mg", time: "rano", taken: false },
-  { name: "Bor", dosage: "6 mg", time: "rano", taken: false },
-];
+type Supplement = {
+  id: number;
+  name: string;
+  dosage: string | null;
+  timeOfDay: string | null;
+  taken: boolean;
+  logId: number | null;
+};
 
-const AKSANA_SUPPLEMENTS = [
-  { name: "D3+K2 (Keto Centrum)", dosage: "3000 IU", time: "rano", taken: false },
-  { name: "Magnez (glicynian)", dosage: "300 mg", time: "wieczor", taken: false },
-  { name: "Omega-3 (EPA+DHA)", dosage: "2g", time: "do posilku", taken: false },
-  { name: "Witamina E", dosage: "200 IU", time: "do posilku", taken: false },
-  { name: "Cynk", dosage: "15 mg", time: "rano", taken: false },
-  { name: "B6 (P5P)", dosage: "50 mg", time: "rano", taken: false },
-  { name: "Siemie lniane", dosage: "1 lyzka", time: "rano", taken: false },
-];
+const TIME_LABELS: Record<string, string> = {
+  morning: "rano",
+  evening: "wieczor",
+  with_meal: "do posilku",
+};
 
 export default function SupplementsPage() {
+  const [krisSupps, setKrisSupps] = useState<Supplement[]>([]);
+  const [aksanaSupps, setAksanaSupps] = useState<Supplement[]>([]);
+
+  const fetchSupps = useCallback(async () => {
+    const [r1, r2] = await Promise.all([
+      fetch("/api/supplements?userId=1"),
+      fetch("/api/supplements?userId=2"),
+    ]);
+    setKrisSupps(await r1.json());
+    setAksanaSupps(await r2.json());
+  }, []);
+
+  useEffect(() => {
+    fetchSupps();
+  }, [fetchSupps]);
+
+  const toggle = async (userId: number, supplementId: number, taken: boolean, logId: number | null) => {
+    if (taken && logId) {
+      await fetch(`/api/supplements?logId=${logId}`, { method: "DELETE" });
+    } else {
+      await fetch("/api/supplements", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, supplementId }),
+      });
+    }
+    fetchSupps();
+  };
+
+  const krisTaken = krisSupps.filter((s) => s.taken).length;
+  const aksanaTaken = aksanaSupps.filter((s) => s.taken).length;
+
   return (
     <div className="space-y-4 pt-6">
       <h1 className="text-2xl font-bold">Suplementy</h1>
 
-      <Card>
-        <CardHeader className="pb-2">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-sm font-medium">Kris</CardTitle>
-            <Badge variant="secondary" className="text-[10px]">0 / {KRIS_SUPPLEMENTS.length}</Badge>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          {KRIS_SUPPLEMENTS.map((s) => (
-            <SupplementRow key={s.name} {...s} />
-          ))}
-        </CardContent>
-      </Card>
+      <SupplementCard
+        name="Kris"
+        supplements={krisSupps}
+        taken={krisTaken}
+        userId={1}
+        onToggle={toggle}
+      />
 
-      <Card>
-        <CardHeader className="pb-2">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-sm font-medium">Aksana</CardTitle>
-            <Badge variant="secondary" className="text-[10px]">0 / {AKSANA_SUPPLEMENTS.length}</Badge>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          {AKSANA_SUPPLEMENTS.map((s) => (
-            <SupplementRow key={s.name} {...s} />
-          ))}
-        </CardContent>
-      </Card>
+      <SupplementCard
+        name="Aksana"
+        supplements={aksanaSupps}
+        taken={aksanaTaken}
+        userId={2}
+        onToggle={toggle}
+      />
     </div>
   );
 }
 
-function SupplementRow({ name, dosage, time, taken }: {
-  name: string; dosage: string; time: string; taken: boolean;
+function SupplementCard({ name, supplements, taken, userId, onToggle }: {
+  name: string;
+  supplements: Supplement[];
+  taken: number;
+  userId: number;
+  onToggle: (userId: number, supplementId: number, taken: boolean, logId: number | null) => void;
 }) {
   return (
-    <div className="flex items-center gap-3">
-      <Checkbox checked={taken} />
-      <div className="flex-1">
-        <div className="text-sm font-medium">{name}</div>
-        <div className="text-xs text-muted-foreground">{dosage} — {time}</div>
-      </div>
-    </div>
+    <Card>
+      <CardHeader className="pb-2">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-sm font-medium">{name}</CardTitle>
+          <Badge
+            variant="secondary"
+            className={`text-[10px] ${taken === supplements.length ? "bg-green-100 text-green-700" : ""}`}
+          >
+            {taken} / {supplements.length}
+          </Badge>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-2">
+        {supplements.map((s) => (
+          <div key={s.id} className="flex items-center gap-3">
+            <Checkbox
+              checked={s.taken}
+              onCheckedChange={() => onToggle(userId, s.id, s.taken, s.logId)}
+            />
+            <div className="flex-1">
+              <div className={`text-sm font-medium ${s.taken ? "line-through text-muted-foreground" : ""}`}>
+                {s.name}
+              </div>
+              <div className="text-xs text-muted-foreground">
+                {s.dosage} — {TIME_LABELS[s.timeOfDay || ""] || s.timeOfDay}
+              </div>
+            </div>
+          </div>
+        ))}
+      </CardContent>
+    </Card>
   );
 }

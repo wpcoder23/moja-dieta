@@ -50,3 +50,4 @@ next-env.d.ts
 
 # server credentials
 .server-credentials
+desktop.ini
