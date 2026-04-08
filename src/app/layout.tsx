@@ -1,11 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { Geist } from "next/font/google";
+import { Roboto } from "next/font/google";
 import "./globals.css";
 import { BottomNav } from "@/components/BottomNav";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+const roboto = Roboto({
+  variable: "--font-roboto",
+  subsets: ["latin", "latin-ext"],
+  weight: ["300", "400", "500", "700"],
 });
 
 export const metadata: Metadata = {
@@ -33,8 +34,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pl" className={`${geistSans.variable} h-full`}>
-      <body className="min-h-full bg-background text-foreground antialiased">
+    <html lang="pl" className={`${roboto.variable} h-full`}>
+      <body className="min-h-full bg-background text-foreground antialiased font-[family-name:var(--font-roboto)]">
         <main className="pb-20 max-w-lg mx-auto px-4">
           {children}
         </main>
