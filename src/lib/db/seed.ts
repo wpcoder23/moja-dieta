@@ -1,6 +1,7 @@
 import { db } from "./index";
 import { users, ingredients, supplementDefinitions } from "./schema";
 import { ingredientsSeed } from "../../data/ingredients-seed";
+import { lidlProductsSeed } from "../../data/lidl-products-seed";
 
 async function seed() {
   console.log("Seeding database...");
@@ -69,6 +70,30 @@ async function seed() {
       }).run();
     }
     console.log(`  Ingredients seeded: ${ingredientsSeed.length} items`);
+
+    // Seed Lidl-specific products
+    for (const ing of lidlProductsSeed) {
+      db.insert(ingredients).values({
+        name: ing.name,
+        category: ing.category,
+        caloriesPer100g: ing.caloriesPer100g,
+        proteinPer100g: ing.proteinPer100g,
+        fatPer100g: ing.fatPer100g,
+        carbsPer100g: ing.carbsPer100g,
+        fiberPer100g: ing.fiberPer100g,
+        micronutrients: JSON.stringify(ing.micronutrients),
+        isGlp1Booster: ing.isGlp1Booster,
+        isAntiInflammatory: ing.isAntiInflammatory,
+        isTestosteroneFriendly: ing.isTestosteroneFriendly,
+        isHormoneFriendly: ing.isHormoneFriendly,
+        isClean15: false,
+        pesticideRisk: ing.pesticideRisk,
+        storeAvailability: JSON.stringify(ing.storeAvailability),
+        notes: ing.notes || null,
+        imageUrl: ing.imageUrl || null,
+      }).run();
+    }
+    console.log(`  Lidl products seeded: ${lidlProductsSeed.length} items`);
   }
 
   // Seed supplements for Kris (userId=1)

@@ -12,7 +12,8 @@ const MENU_ITEMS = [
   { href: "/fasting", label: "Post przerywany", desc: "Timer okna jedzenia" },
   { href: "/cycle", label: "Cykl (Aksana)", desc: "Faza cyklu + carb cycling" },
   { href: "/progress", label: "Waga i aktywnosc", desc: "Wykres, treningi" },
-  { href: "/scan", label: "Skaner AI", desc: "Zdjecie → kalorie" },
+  { href: "/scan", label: "Skaner jedzenia AI", desc: "Zdjecie posilku → kalorie" },
+  { href: "/receipt", label: "Skaner paragonu", desc: "Zdjecie paragonu → produkty + ocena diety" },
   { href: "/steps", label: "Kroki (iOS Shortcut)", desc: "Instrukcja synchronizacji krokow" },
 ];
 

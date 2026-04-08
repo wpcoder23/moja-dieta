@@ -45,6 +45,7 @@ export const ingredients = sqliteTable("ingredients", {
   pesticideRisk: text("pesticide_risk"), // low/medium/high
   storeAvailability: text("store_availability"), // JSON ["lidl","biedronka","auchan"]
   notes: text("notes"),
+  imageUrl: text("image_url"),
 });
 
 export const meals = sqliteTable("meals", {
