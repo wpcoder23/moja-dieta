@@ -19,6 +19,7 @@ export type IngredientSeed = {
   pesticideRisk: "low" | "medium" | "high";
   storeAvailability: string[];
   notes?: string;
+  imageUrl?: string;
 };
 
 // Micronutrient keys:

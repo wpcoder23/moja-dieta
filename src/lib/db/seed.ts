@@ -2,6 +2,7 @@ import { db } from "./index";
 import { users, ingredients, supplementDefinitions } from "./schema";
 import { ingredientsSeed } from "../../data/ingredients-seed";
 import { lidlProductsSeed } from "../../data/lidl-products-seed";
+import { imageMap } from "../../data/image-map";
 
 async function seed() {
   console.log("Seeding database...");
@@ -67,6 +68,7 @@ async function seed() {
         pesticideRisk: ing.pesticideRisk,
         storeAvailability: JSON.stringify(ing.storeAvailability),
         notes: ing.notes || null,
+        imageUrl: imageMap[ing.name] || null,
       }).run();
     }
     console.log(`  Ingredients seeded: ${ingredientsSeed.length} items`);
