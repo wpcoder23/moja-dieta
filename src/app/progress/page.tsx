@@ -187,6 +187,9 @@ export default function ProgressPage() {
         </CardContent>
       </Card>
 
+      {/* Activity / Workout */}
+      <WorkoutCard userId={activeUser} />
+
       {/* Recent logs */}
       {logs.length > 0 && (
         <Card>
@@ -204,5 +207,101 @@ export default function ProgressPage() {
         </Card>
       )}
     </div>
+  );
+}
+
+const WORKOUT_TYPES = [
+  { value: "silownia", label: "Silownia" },
+  { value: "bieganie", label: "Bieganie" },
+  { value: "spacer", label: "Spacer" },
+  { value: "rower", label: "Rower" },
+  { value: "plywanie", label: "Plywanie" },
+  { value: "yoga", label: "Yoga" },
+  { value: "hiit", label: "HIIT" },
+  { value: "cardio", label: "Cardio" },
+  { value: "inne", label: "Inne" },
+];
+
+function WorkoutCard({ userId }: { userId: number }) {
+  const [workoutType, setWorkoutType] = useState("");
+  const [duration, setDuration] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [lastResult, setLastResult] = useState<{ workoutCalories: number } | null>(null);
+  const [todayWorkouts, setTodayWorkouts] = useState<{ workoutType: string; workoutDurationMin: number; workoutCalories: number }[]>([]);
+
+  useEffect(() => {
+    fetch(`/api/activity?userId=${userId}`).then((r) => r.json()).then((data) => {
+      setTodayWorkouts(data.filter((a: { workoutType: string | null }) => a.workoutType));
+    });
+  }, [userId, lastResult]);
+
+  const saveWorkout = async () => {
+    if (!workoutType || !duration) return;
+    setSaving(true);
+    const res = await fetch("/api/activity", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId, workoutType, workoutDurationMin: parseInt(duration) }),
+    });
+    const data = await res.json();
+    setLastResult(data);
+    setWorkoutType("");
+    setDuration("");
+    setSaving(false);
+  };
+
+  return (
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm font-medium">Trening</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <div className="flex gap-2 flex-wrap">
+          {WORKOUT_TYPES.map((t) => (
+            <button
+              key={t.value}
+              onClick={() => setWorkoutType(t.value)}
+              className={`text-xs px-2 py-1 rounded-full border ${
+                workoutType === t.value
+                  ? "bg-green-600 text-white border-green-600"
+                  : "border-border text-muted-foreground"
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+        {workoutType && (
+          <div className="flex gap-2">
+            <Input
+              type="number"
+              placeholder="Czas (min)"
+              value={duration}
+              onChange={(e) => setDuration(e.target.value)}
+              className="flex-1"
+            />
+            <Button onClick={saveWorkout} disabled={saving} className="bg-green-600 hover:bg-green-700">
+              {saving ? "..." : "Zapisz"}
+            </Button>
+          </div>
+        )}
+        {lastResult && (
+          <div className="text-sm text-green-600">
+            Spalone: ~{lastResult.workoutCalories} kcal
+          </div>
+        )}
+        {todayWorkouts.length > 0 && (
+          <div className="space-y-1">
+            <div className="text-xs text-muted-foreground">Dzisiejsze treningi:</div>
+            {todayWorkouts.map((w, i) => (
+              <div key={i} className="flex justify-between text-sm">
+                <span>{WORKOUT_TYPES.find((t) => t.value === w.workoutType)?.label || w.workoutType}</span>
+                <span className="text-muted-foreground">{w.workoutDurationMin} min — ~{w.workoutCalories} kcal</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }
