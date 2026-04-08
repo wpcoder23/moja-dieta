@@ -15,8 +15,11 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           password: ${{ secrets.VPS_PASSWORD }}
           script: |
+            export DATABASE_PATH=/opt/moja-dieta/data/moja-dieta.sqlite
             cd /opt/moja-dieta/app
             git pull origin master
             npm install
             npm run build
+            npx drizzle-kit push
+            npx tsx src/lib/db/seed.ts
             pm2 restart moja-dieta
