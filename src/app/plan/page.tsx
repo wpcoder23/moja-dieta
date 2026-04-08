@@ -255,7 +255,48 @@ export default function PlanPage() {
               </CardContent>
             </Card>
           )}
+
+          {/* Generate shopping list */}
+          <GenerateShoppingButton userId={userId} />
         </>
+      )}
+    </div>
+  );
+}
+
+function GenerateShoppingButton({ userId }: { userId: number }) {
+  const [generating, setGenerating] = useState(false);
+  const [result, setResult] = useState<{ generated: number } | null>(null);
+
+  const generate = async () => {
+    setGenerating(true);
+    const res = await fetch("/api/shopping/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId }),
+    });
+    const data = await res.json();
+    setResult(data);
+    setGenerating(false);
+  };
+
+  return (
+    <div className="space-y-2">
+      <Button
+        onClick={generate}
+        disabled={generating}
+        variant="outline"
+        className="w-full"
+      >
+        {generating ? "Generuje liste..." : "Wygeneruj liste zakupow z planu"}
+      </Button>
+      {result && (
+        <Card className="bg-green-50 border-green-200">
+          <CardContent className="py-2 text-center text-sm text-green-700">
+            Wygenerowano {result.generated} produktow!{" "}
+            <a href="/shopping" className="underline font-medium">Zobacz liste →</a>
+          </CardContent>
+        </Card>
       )}
     </div>
   );

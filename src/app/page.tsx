@@ -91,6 +91,22 @@ export default function DashboardPage() {
         </div>
       )}
 
+      {/* Quick actions */}
+      <div className="flex gap-2">
+        <button
+          onClick={() => window.location.href = "/log-meal"}
+          className="flex-1 bg-green-600 text-white rounded-lg py-2 text-sm font-medium hover:bg-green-700"
+        >
+          + Zapisz posilek
+        </button>
+        <button
+          onClick={() => window.location.href = "/scan"}
+          className="flex-1 bg-blue-600 text-white rounded-lg py-2 text-sm font-medium hover:bg-blue-700"
+        >
+          Skanuj AI
+        </button>
+      </div>
+
       {/* Calorie Balance */}
       <Card>
         <CardHeader className="pb-2">
