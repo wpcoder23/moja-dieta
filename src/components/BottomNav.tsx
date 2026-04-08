@@ -8,7 +8,7 @@ const tabs = [
   { href: "/shopping", label: "Zakupy", icon: ShoppingIcon },
   { href: "/plan", label: "Plan", icon: PlanIcon },
   { href: "/progress", label: "Progres", icon: ProgressIcon },
-  { href: "/scan", label: "Skaner", icon: ScanIcon },
+  { href: "/settings", label: "Menu", icon: MenuIcon },
 ];
 
 export function BottomNav() {
@@ -80,11 +80,12 @@ function ProgressIcon({ active }: { active: boolean }) {
   );
 }
 
-function ScanIcon({ active }: { active: boolean }) {
+function MenuIcon({ active }: { active: boolean }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2.5 : 2} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" />
-      <circle cx="12" cy="13" r="3" />
+      <line x1="4" x2="20" y1="12" y2="12" />
+      <line x1="4" x2="20" y1="6" y2="6" />
+      <line x1="4" x2="20" y1="18" y2="18" />
     </svg>
   );
 }
